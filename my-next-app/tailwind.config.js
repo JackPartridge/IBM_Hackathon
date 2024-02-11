@@ -17,12 +17,13 @@ module.exports = {
   plugins: [require('daisyui')],
   daisyui: {
     themes: [
-      'pastel',
+      {
+        mytheme: {
+          'primary': '#ece3ca',
+          'secondary': '#178D43',
+          'danger': '#e3342f',
+        },
+      },
     ],
-  },
-  colors: {
-    'primary': '#3490dc',
-    'secondary': '#ffed4a',
-    'danger': '#e3342f',
-  },
+  }
 }
