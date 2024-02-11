@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function Header () {
   return (
-    <div className="navbar bg-neutral pl-10 pr-10 pt-4 pb-4">
+    <div className="navbar bg-secondary drop-shadow-xl outline outline-1 shadow-black  navbar-style" >
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={ 0 } role="button" className="btn btn-ghost lg:hidden">
