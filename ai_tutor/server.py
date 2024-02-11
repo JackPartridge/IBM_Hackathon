@@ -1,20 +1,20 @@
+import time
 from typing import Annotated
 import asyncio
 
-from fastapi import FastAPI, Form, status
+from fastapi import FastAPI, Form, UploadFile, status, File
 from pydantic import BaseModel
 
 from assistant_modes import Mode
 
-from open_ai import assistant_client, thread_client, retrieve_assistant, create_assistant
+from open_ai import assistant_client, thread_client, retrieve_assistant, create_assistant, upload_file, create_thread
 from openai.types.beta.assistant import Assistant
 
 from tutor.tutor import AITutor
 
-from db import db, insert_document, retrieve_assistant_document
+from db import db, insert_document, retrieve_assistant_document, update_document
 
 class Query(BaseModel):
-    mode: Mode
     query: str
 
 
@@ -24,60 +24,128 @@ server = FastAPI()
 def health_check():
     return "HEALTHY!!!"
 
-@server.get("/query/{query}")
+@server.get("/query-check/{query}")
 async def query(query: str):
     return query
 
 @server.post("/sign-up/user/{id}")
 async def user_sign_up(id):
-    return ("Write user id to DB")
+    if await retrieve_assistant_document(db=db, user_id=id):
+        return {
+            status.HTTP_409_CONFLICT: "User already exists"
+        }
+    await insert_document(db=db, document={"user_id": id})
+    return ("User added!!!")
 
 
-@server.post("/create-tutor/{mode}/{user_id}")
-async def create_buudy(mode: Mode, user_id: str):
+@server.post("/create-tutor/{user_id}")
+async def create_buudy(user_id: str):
     document = {
         "user_id": user_id,
-        "mode": mode,
     }
 
-    if await retrieve_assistant_document(db=db, user_id=user_id, mode=mode):
+    print(document)
+
+    result = await retrieve_assistant_document(db=db, user_id=user_id)
+    if result.get("assistant_id"):
         return status.HTTP_208_ALREADY_REPORTED
+    print(f"result HERE!!!! --->> {result}")
     
-    if mode == Mode.STUDY:
-        tutor = AITutor(
-            name="Study Buddy",
-            instructions="You are a study guide an tutor",
-            mode=Mode.STUDY
-        )
+    tutor = AITutor(
+        name=f"{user_id} AI Tutor",
+    )
 
     assistant = create_assistant(
         tutor=tutor
     )
 
-    document["assistant_id"] = assistant.id
+    thread = create_thread(thread_client=thread_client)
 
-    await insert_document(db=db, document=document)
+    new_document = dict()
+
+    new_document["assistant_id"] = assistant.id
+    new_document["thread_id"] = thread.id
+
+    print("New document -->", document)
+
+    await update_document(db=db, document=document, new_update=new_document)
 
 
 
-@server.get("/query/{user_id}")
+@server.post("/query/{user_id}")
 async def query(user_id: str, query: Query):
     assistant: Assistant = None
-    user_agent_document = await retrieve_assistant_document(db=db, user_id=user_id, mode=query.mode)
+    user_agent_document = await retrieve_assistant_document(db=db, user_id=user_id)
     if user_agent_document:
         if user_agent_document["assistant_id"]:
             assistant = retrieve_assistant(assistant_id=user_agent_document["assistant_id"])
+            thread_id = user_agent_document["thread_id"]
         else:
             return f"{status.HTTP_404_NOT_FOUND}: {query.mode} buddy agent does not exist for this user"
     else:
         return f"{status.HTTP_404_NOT_FOUND}: {query.mode} agent does not exist for this user"
     
-    assistant
+    # TODO: Cancel all runs here
 
-    # assistant_id = assistant_json.key()[0]
+    message_obj = thread_client.messages.create(thread_id=thread_id, content=query.query, role="user")
+    print("Message obj: ", message_obj)
 
-    # buddy = client.beta.assistant.retrieve(assistant_id)
+    run = thread_client.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant.id,
+    )
 
-    # buddy.an
+    time.sleep(5)
+
+    while run.status != "completed":
+        run = thread_client.runs.create(
+            thread_id=thread_id,
+            assistant_id=assistant.id,
+        )
+        time.sleep(2)
+
+    run_value = thread_client.runs.retrieve(
+        thread_id=thread_id,
+        run_id=run.id
+    )
+
+    display_messages = []
+    if run.status == "completed":
+        # get the message list
+        message_list = thread_client.messages.list(thread_id=thread_id, order="desc")
+        print("Message List", message_list)
+        for index, message in enumerate(message_list):
+            if message.role == "user": # last message sent by the user
+                display_messages = message_list[:index]
+                break
+        
+    display_messages.reverse()
+
+    print("Display List: ", display_messages)
+
+    display_message = "\n".join(display_messages)
+
+    print("We got to the end")
+
+    return display_message
+
 
         
+@server.post("/file-upload/{user_id}")
+async def file_upload(
+    user_id: str,
+    file: Annotated[bytes, File()],
+    fileb: Annotated[UploadFile, File()],
+    token: Annotated[str, Form()]
+):
+    user = await retrieve_assistant_document(db=db, user_id=user_id)
+    if user:
+        if user.get("assistant_id"):
+            assistant = retrieve_assistant(assistant_id=user.get("assistant_id"))
+    else:
+        f"{status.HTTP_404_NOT_FOUND}: User not found"
+
+    upload_file(assistant_client=assistant_client, assistant=assistant, file=file)
+            
+
+    
