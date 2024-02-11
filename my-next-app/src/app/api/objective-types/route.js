@@ -15,5 +15,3 @@ export async function GET () {
   }
 }
 
-// Handle POST requests separately if needed
-
