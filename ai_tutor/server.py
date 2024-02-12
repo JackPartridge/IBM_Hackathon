@@ -48,7 +48,14 @@ async def create_buudy(user_id: str):
 
     result = await retrieve_assistant_document(db=db, user_id=user_id)
     if result.get("assistant_id"):
-        return status.HTTP_208_ALREADY_REPORTED
+        if result.get("thread_id"):
+            return status.HTTP_208_ALREADY_REPORTED
+        else:
+            thread = create_thread(thread_client=thread_client)
+            new_document = {"thread_id": thread.id}
+            await update_document(db=db, document=document, new_update=new_document)
+            return {status.HTTP_200_OK, "Thread Created. Assistant already available for user"}
+
     print(f"result HERE!!!! --->> {result}")
     
     tutor = AITutor(
@@ -95,33 +102,39 @@ async def query(user_id: str, query: Query):
         assistant_id=assistant.id,
     )
 
-    time.sleep(5)
+    time.sleep(10)
 
-    while run.status != "completed":
-        run = thread_client.runs.create(
-            thread_id=thread_id,
-            assistant_id=assistant.id,
-        )
-        time.sleep(2)
+    # while run.status != "completed":
+    #     run = thread_client.runs.create(
+    #         thread_id=thread_id,
+    #         assistant_id=assistant.id,
+    #     )
+    #     time.sleep(2)
 
     run_value = thread_client.runs.retrieve(
         thread_id=thread_id,
         run_id=run.id
     )
+    message_obj_list = []
+    if run_value.status == "completed":
+        message_list = thread_client.messages.list(thread_id=thread_id, order="desc")
+        for message in message_list:
+            if message.role == "user":
+                break
+            message_obj_list.append(message)
 
     display_messages = []
-    if run.status == "completed":
-        # get the message list
-        message_list = thread_client.messages.list(thread_id=thread_id, order="desc")
-        print("Message List", message_list)
-        for index, message in enumerate(message_list):
-            if message.role == "user": # last message sent by the user
-                display_messages = message_list[:index]
-                break
-        
-    display_messages.reverse()
+    for msg_obj in message_obj_list:
+        display_messages.append(msg_obj.content[0].text.value)
 
-    print("Display List: ", display_messages)
+    # if run.status == "completed":
+    #     # get the message list
+    #     message_list = thread_client.messages.list(thread_id=thread_id, order="desc")
+    #     print("Message List", message_list)
+    #     for index, message in enumerate(message_list):
+    #         if message.role == "user": # last message sent by the user
+    #             display_messages = message_list[:index]
+    #             break
 
     display_message = "\n".join(display_messages)
 

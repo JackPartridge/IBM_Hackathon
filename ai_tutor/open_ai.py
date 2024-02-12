@@ -68,15 +68,41 @@ if __name__ == "__main__":
 
     # assistant = retrieve_assistant("asst_xr4rGmkNahhHAsYblaXS8iGY")
 
-    assistant_list = assistant_client.list()
+    # assistant_list = assistant_client.list()
+    # print(assistant_list)
 
-    # run = thread_client.runs.retrieve(run_id="run_C1dybS4zfq43CDHT3FyNiE4k", thread_id="thread_N9OIlqeFIZRD5sQN3b2WsYMg")
-    runs = thread_client.runs.list(thread_id="thread_N9OIlqeFIZRD5sQN3b2WsYMg")
+    # for assistant in assistant_list:
+    #     assistant_client.delete(assistant_id=assistant.id)
+    thread_id = "thread_T9qiiVZF5xhGNEsiBpOktXBJ"
+    run_id = "run_a5r837a7B7A0t4vS0ZGZhIL4"
+    run = thread_client.runs.retrieve(run_id=run_id, thread_id=thread_id)
+
+    display_messages = []
+    if run.status == "completed":
+        # get the message list
+        message_list = thread_client.messages.list(thread_id=thread_id, order="desc")
+        print("Message List", message_list)
+        for message in message_list:
+            if message.role == "user": # last message sent by the user
+                break
+            display_messages.append(message)
+    print("\n------------------------------")
+    print(display_messages)
+    # runs = thread_client.runs.list(thread_id="thread_T9qiiVZF5xhGNEsiBpOktXBJ")
+
+    # thread = thread_client.delete(thread_id="thread_1n0t9r6w1pdgXwuJWvag2Uno")
+    # thread2 = thread_client.delete(thread_id="thread_d0gURsTRkxuvDMHZKEOIoxZD")
+    # thread3 = thread_client.delete(thread_id="thread_N9OIlqeFIZRD5sQN3b2WsYMg")
+
+    # print("Thread 1: ", thread)
+    # print("Thread 2: ", thread2)
+    # print("Thread 3: ", thread3)
+
 
     # print(type(assistant))
     # print(assistant_list)
 
-    # print(runs)
+    print(run)
     import pdb; pdb.set_trace()
 
     # # Delete assistants
