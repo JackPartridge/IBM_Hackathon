@@ -1,5 +1,5 @@
 import time
-from typing import Annotated
+from typing import Annotated, Optional
 import asyncio
 
 from fastapi import FastAPI, Form, UploadFile, status, File
@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from assistant_modes import Mode
 
-from open_ai import assistant_client, thread_client, retrieve_assistant, create_assistant, upload_file, create_thread
+from open_ai import assistant_client, thread_client, retrieve_assistant, create_assistant, upload_file, create_thread, file_assistant
 from openai.types.beta.assistant import Assistant
 
 from tutor.tutor import AITutor
@@ -160,8 +160,7 @@ async def query(user_id: str, query: Query):
 async def file_upload(
     user_id: str,
     file: Annotated[bytes, File()],
-    fileb: Annotated[UploadFile, File()],
-    token: Annotated[str, Form()]
+    # fileb: Optional[Annotated[UploadFile, File()]],
 ):
     user = await retrieve_assistant_document(db=db, user_id=user_id)
     if user:
@@ -170,7 +169,7 @@ async def file_upload(
     else:
         f"{status.HTTP_404_NOT_FOUND}: User not found"
 
-    upload_file(assistant_client=assistant_client, assistant=assistant, file=file)
+    upload_file(assistant_client=assistant_client, assistant=assistant, file=file, file_client=file_assistant)
             
 
     

@@ -34,13 +34,13 @@ def retrieve_assistant(assistant_id: str) -> Assistant:
 def create_thread(thread_client) -> Any:
     return thread_client.create()
 
-def upload_file(assistant_client: Any, assistant: Assistant, file: Any, purpose="assistants"):
-    fileObj = file.create(
+def upload_file(assistant_client: Any, assistant: Assistant, file: Any, file_client: Any, purpose="assistants"):
+    fileObj = file_client.create(
         file=file,
         purpose=purpose
     )
 
-    assistant.update(
+    assistant_client.update(
         assistant_id=assistant.id,
         file_ids= [fileObj.id] + assistant.file_ids
     )
