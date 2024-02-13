@@ -47,6 +47,15 @@ export default function ObjectiveTypesPage () {
     })
   }
 
+  const uniqueObjectiveTypes = objectiveTypes.reduce((acc, current) => {
+    const x = acc.find(item => item.objective_type_id === current.objective_type_id)
+    if (!x) {
+      return acc.concat([current])
+    } else {
+      return acc
+    }
+  }, [])
+
   // const testPostRequest = async (objectiveTypeId, userId, description) => {
   //   console.log('Initiating testPostRequest function with:', { objectiveTypeId, userId, description })
   //
@@ -188,52 +197,54 @@ export default function ObjectiveTypesPage () {
   return (
     <main className="bg-base-100">
       {/*TAB 1*/ }
-      <div role="tablist" className="tabs tabs-lifted p-16 bg-green-100">
+      <div role="tablist" className="tabs tabs-lifted p-16 bg-primary">
         <input
           type="radio"
           name="my_tabs_2"
           role="tab"
-          className="tab w-fit"
-          aria-label="How would you accomplish this?"
+          className={ `tab w-fit ${ activeTab === 'Tab 1' ? 'bg-error' : '' }` }
+          aria-label="What are your aims for the year?"
           checked={ activeTab === 'Tab 1' }
           onChange={ () => setActiveTab('Tab 1') }
         />
-        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-8">
+        <div role="tabpanel" className="tab-content border-base-300 rounded-box p-8 bg-white">
           <div>
-            { objectiveTypes.map((objectiveType) => (
-              <div key={ objectiveType.objective_type_id } className="card w-full bg-info shadow-xl mb-16 mt-4">
-                <div className="card-body">
-                  <div>
-                    <h1 className="card-title float-start flex flex-1">{ objectiveType.type }</h1>
-                    <p className="menu-title float-end flex flex-1">
-                      { new Date(objectiveType.created_at).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric',
-                        timeZoneName: 'short',
-                      }) }
-                    </p>
+            {
+              uniqueObjectiveTypes.map((objectiveType) => (
+                <div key={ objectiveType.objective_type_id } className="card w-full bg-error shadow-xl mb-16 mt-4">
+                  <div className="card-body">
+                    <div>
+                      <h1 className="card-title float-start flex flex-1">{ objectiveType.type }</h1>
+                      <p className="menu-title float-end flex flex-1">
+                        { new Date(objectiveType.created_at).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          second: 'numeric',
+                          timeZoneName: 'short',
+                        }) }
+                      </p>
+                    </div>
+                    <h3 className="card-body p-0">Student Comments</h3>
+                    <textarea
+                      className="textarea textarea-bordered rounded-md bg-white w-full"
+                      placeholder="Enter your response"
+                      rows="4"
+                      value={ descriptions[objectiveType.objective_type_id] || '' }
+                      onChange={ (e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value) }
+                    ></textarea>
+                    <button
+                      onClick={ () => handleSubmit(objectiveType.objective_type_id, user_id, descriptions[objectiveType.objective_type_id]) }
+                      className="btn btn-primary outline outline-black mt-4 w-fit flex float-right"
+                    >
+                      Submit
+                    </button>
                   </div>
-                  <h3 className="card-body p-0">Student Comments</h3>
-                  <textarea
-                    className="textarea textarea-bordered rounded-md bg-white w-full"
-                    placeholder="Enter your response"
-                    rows="4"
-                    value={ descriptions[objectiveType.objective_type_id] || '' }
-                    onChange={ (e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value) }
-                  ></textarea>
-                  <button
-                    className="btn btn-accent mt-4 w-fit flex float-right"
-                    onClick={ () => handleSubmit(objectiveType.objective_type_id) }
-                  >
-                    Submit
-                  </button>
                 </div>
-              </div>
-            )) }
+              ))
+            }
           </div>
         </div>
 
@@ -247,10 +258,10 @@ export default function ObjectiveTypesPage () {
           checked={ activeTab === 'Tab 2' }
           onChange={ () => setActiveTab('Tab 2') }
         />
-        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-4">
+        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-8">
           <div>
-            { objectiveTypes.map((objectiveType) => (
-              <div key={ objectiveType.objective_type_id } className="card w-full bg-info shadow-xl mb-16 mt-4">
+            { uniqueObjectiveTypes.map((objectiveType) => (
+              <div key={ objectiveType.objective_type_id } className="card w-full bg-error shadow-xl mb-16 mt-4">
                 <div className="card-body">
                   <div>
                     <h1 className="card-title float-start flex flex-1">{ objectiveType.type }</h1>
@@ -276,12 +287,12 @@ export default function ObjectiveTypesPage () {
                   ></textarea>
                   <button
                     onClick={ () => handleSubmit(objectiveType.objective_type_id, user_id, descriptions[objectiveType.objective_type_id]) }
-                    className="btn btn-accent mt-4 w-fit flex float-right"
+                    className="btn btn-primary outline outline-black mt-4 w-fit flex float-right"
                   >
                     Submit
                   </button>
                 </div>
-                <div className="card bg-base-100 shadow-xl ml-32 p-10 m-8 mt-0">
+                <div className="card shadow-xl ml-32 p-10 m-8 mt-0 bg-primary outline outline-secondary outline-2">
                   <div>
                     <h1 className="card-title float-start flex flex-1">Tutor feedback</h1>
                     <p className="menu-title float-end flex flex-1">
@@ -297,9 +308,9 @@ export default function ObjectiveTypesPage () {
                     </p>
                   </div>
                   <textarea
-                    className="textarea textarea-bordered rounded-md"
+                    className="textarea textarea-bordered rounded-md bg-white w-full"
                     placeholder="You have no feedback yet"
-                    value={ objectiveType.mid_tutor_comment || 'You have no feedback yet' }
+                    value={ objectiveType.mid_tutor_comment }
                     readOnly
                   ></textarea>
                 </div>
@@ -312,71 +323,66 @@ export default function ObjectiveTypesPage () {
         {/*TAB 3*/ }
         <input
           type="radio"
-          name="my_tabs_2"
+          name="my_tabs_3"
           role="tab"
           className="tab"
           aria-label="End Year Outcome"
           checked={ activeTab === 'Tab 3' }
           onChange={ () => setActiveTab('Tab 3') }
         />
-        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-4">
+        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-8">
           <div>
-            { objectives.map((objective) => (
-              <div key={ objective.objective_id } className="card w-full bg-info shadow-xl mb-16 mt-4">
+            { uniqueObjectiveTypes.map((objectiveType) => (
+              <div key={ objectiveType.objective_type_id } className="card w-full bg-error shadow-xl mb-16 mt-4">
                 <div className="card-body">
                   <div>
-                    <h1 className="card-title float-start flex flex-1">{ objective.type }</h1>
-                    { objective.description_date && (
-                      <p className="menu-title float-end flex flex-1">
-                        { new Date(objective.created_at).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric',
-                          second: 'numeric',
-                          timeZoneName: 'short',
-                        }) }
-                      </p>
-                    ) }
+                    <h1 className="card-title float-start flex flex-1">{ objectiveType.type }</h1>
+                    <p className="menu-title float-end flex flex-1">
+                      { new Date(objectiveType.description_date).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZoneName: 'short',
+                      }) }
+                    </p>
                   </div>
                   <h3 className="card-body p-0">Student Comments</h3>
                   <textarea
                     className="textarea textarea-bordered rounded-md bg-white w-full"
                     placeholder="Enter your response"
                     rows="4"
-                    value={ descriptions[objective.objective_type_id] || '' }
-                    onChange={ (e) => handleDescriptionChange(objective.objective_type_id, e.target.value) }
+                    value={ descriptions[objectiveType.objective_type_id] || '' }
+                    onChange={ (e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value) }
                   ></textarea>
                   <button
-                    onClick={ () => handleSubmit(objective.objective_type_id, user_id) } // Replace `user_id` with actual user ID from your session/context
-                    className="btn btn-accent mt-4 w-fit flex float-right"
+                    onClick={ () => handleSubmit(objectiveType.objective_type_id, user_id, descriptions[objectiveType.objective_type_id]) }
+                    className="btn btn-primary outline outline-black mt-4 w-fit flex float-right"
                   >
                     Submit
                   </button>
                 </div>
-                <div className="card bg-base-100 shadow-xl ml-32 p-10 m-8 mt-0">
+                <div className="card shadow-xl ml-32 p-10 m-8 mt-0 bg-primary outline outline-secondary outline-2">
                   <div>
-                    <h1 className="card-title float-start flex flex-1 pb-4">Tutor feedback</h1>
-                    { objective.end_comment_date && (
-                      <p className="menu-title float-end flex flex-1">
-                        { new Date(objective.end_comment_date).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric',
-                          second: 'numeric',
-                          timeZoneName: 'short',
-                        }) }
-                      </p>
-                    ) }
-
+                    <h1 className="card-title float-start flex flex-1">Tutor feedback</h1>
+                    <p className="menu-title float-end flex flex-1">
+                      { new Date(objectiveType.end_comment_date).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZoneName: 'short',
+                      }) }
+                    </p>
                   </div>
                   <textarea
-                    className="textarea textarea-bordered rounded-md"
+                    className="textarea textarea-bordered rounded-md bg-white w-full"
                     placeholder="You have no feedback yet"
-                    value={ objective.end_tutor_comment || 'You have no feedback yet' }
+                    value={ objectiveType.end_tutor_comment }
                     readOnly
                   ></textarea>
                 </div>
