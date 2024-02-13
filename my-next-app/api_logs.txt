@@ -1,0 +1,2 @@
+Failed to fetch objectives: Error: Unknown column 'objective_types.id' in 'on clause'
+Failed to fetch objectives: Error: Unknown column 'objective_types.id' in 'on clause'
