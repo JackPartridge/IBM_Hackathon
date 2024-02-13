@@ -9,7 +9,3 @@ Failed to fetch objectives: Error
 Failed to fetch objectives: Error
 Failed to fetch objectives: Error
 Failed to fetch objectives: Error
-Failed to fetch objectives: Error: connect ETIMEDOUT
-Failed to fetch objectives: Error: connect ETIMEDOUT
-Failed to fetch objectives: Error: connect ETIMEDOUT
-Failed to fetch objectives: Error: connect ETIMEDOUT
