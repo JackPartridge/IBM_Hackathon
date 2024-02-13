@@ -5,3 +5,7 @@ Failed to fetch objectives: Error: Client has already been connected. You cannot
 Failed to fetch objectives: Error: connect ETIMEDOUT
 Failed to fetch objectives: Error: getaddrinfo ENOTFOUND localhost:3306
 Failed to fetch objectives: Error: getaddrinfo ENOTFOUND localhost:3306
+Failed to fetch objectives: Error
+Failed to fetch objectives: Error
+Failed to fetch objectives: Error
+Failed to fetch objectives: Error
