@@ -9,10 +9,10 @@ export default function Example() {
   return (
     <div className= 'bg-primary shadow-inner'>
       <div className="relative isolate ">
-        <div className="relative z-20 float-end flex flex-1 mt-[1px]">
+         <div className="relative z-20 float-end flex flex-1 mt-[1px]">
           <img
             className = "border border-none"
-            src='https://i.ibb.co/GvsB8YK/Studious-Owl-removebg-preview.png'
+            src='https://i.ibb.co/GvsB8YK/Studious-Owl-removebg-preview.png'        
             alt="Studious Owl"
             width="750px"
             height="750px"
@@ -33,8 +33,8 @@ export default function Example() {
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
                 href="#"
-                className="bg-secondary rounded-md px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-info focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
-                Buddies
+                className="bg-info rounded-md px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
+                Buddies 
               </a>
               <a href="#" className="ghost text-sm font-semibold leading-6 text-gray-900">
                 Login <span aria-hidden="true">→</span>
