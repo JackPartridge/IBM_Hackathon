@@ -140,7 +140,7 @@ async def query(user_id: str, query: Query):
 
     print("We got to the end")
 
-    return display_message
+    return {"reply": display_message}
 
 
         
