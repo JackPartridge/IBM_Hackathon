@@ -5,11 +5,11 @@ import Loading from '../loading'
 
 export default function ObjectiveTypesPage () {
   const [isLoading, setIsLoading] = useState(true) // Added loading state
-  const [activeTab, setActiveTab] = useState('Tab 1')
+  const [activeTab, setActiveTab] = useState('Tab 2')
 
   const [objectives, setObjectives] = useState([])
-  const [objectiveTypes, setObjectiveTypes] = useState([]);
-  const [user_id, setUserId] = useState(1); // Assuming user_id is known, static, or fetched
+  const [objectiveTypes, setObjectiveTypes] = useState([])
+  const [user_id, setUserId] = useState(1) // Assuming user_id is known, static, or fetched
   const [descriptions, setDescriptions] = useState({}) // Object to hold descriptions for each objective type
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -19,6 +19,12 @@ export default function ObjectiveTypesPage () {
       try {
         const res = await fetch('/api/objective-types') // Adjust the endpoint if needed
         const data = await res.json()
+
+        // fetch objectives
+        const objectivesRes = await fetch('/api/objectives') // Adjust the endpoint if needed
+        const objectivesData = await objectivesRes.json()
+
+        setObjectives(objectivesData)
         setObjectiveTypes(data) // Use setObjectiveTypes here
       } catch (e) {
         console.error('Failed to fetch objective types:', e)
@@ -38,8 +44,8 @@ export default function ObjectiveTypesPage () {
     setDescriptions({
       ...descriptions,
       [objectiveTypeId]: value,
-    });
-  };
+    })
+  }
 
   // const testPostRequest = async (objectiveTypeId, userId, description) => {
   //   console.log('Initiating testPostRequest function with:', { objectiveTypeId, userId, description })
@@ -90,36 +96,35 @@ export default function ObjectiveTypesPage () {
   //
   // }
 
-  const handleSubmit = async (objectiveTypeId) => {
-    const description = descriptions[objectiveTypeId];
-    // Prepare the data to send
-    const dataToSend = { objective_type_id: objectiveTypeId, user_id, description };
-
-    try {
-      const response = await fetch('/api/objectives', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      console.log(JSON.stringify(dataToSend))
-
-      if (!response.ok) {
-        console.log(response)
-        throw new Error('Network response was not ok');
-      }
-
-      // Handle success
-      console.log('Objective submitted successfully');
-      // Optionally reset the form or give user feedback
-    } catch (error) {
-      console.error('Failed to submit objective:', error);
-      // Handle errors, such as by displaying a message to the user
-    }
-  };
-
+  // const handleSubmit = async (objectiveTypeId) => {
+  //   // // Prepare the data to send
+  //   const description = descriptions[objectiveTypeId]
+  //   const dataToSend = { objective_type_id: objectiveTypeId, user_id, description };
+  //
+  //   try {
+  //     const response = await fetch('/api/objectives', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: dataToSend,
+  //     });
+  //
+  //     console.log(JSON.stringify(dataToSend))
+  //
+  //     if (!response.ok) {
+  //       console.log(response)
+  //       throw new Error('Network response was not ok');
+  //     }
+  //
+  //     // Handle success
+  //     console.log('Objective submitted successfully');
+  //     // Optionally reset the form or give user feedback
+  //   } catch (error) {
+  //     console.error('Failed to submit objective:', error);
+  //     // Handle errors, such as by displaying a message to the user
+  //   }
+  // };
 
   // const testPostRequest = async (objectiveTypeId, userId, description) => {
   //   const response = await fetch('/api/objectives', {
@@ -138,6 +143,48 @@ export default function ObjectiveTypesPage () {
   //   const result = await response.json()
   //   console.log('POST request successful:', result)
   // }
+
+  // Import necessary hooks or utilities if you're using React
+  // For example, import { useState } from 'react';
+
+  // Assuming `handleSubmit` is within a component or a relevant context
+
+  const handleSubmit = async (objectiveTypeId, user_id, description) => {
+    const submitData = {
+      objective_type_id: objectiveTypeId,
+      user_id: user_id,
+      description: description,
+    }
+    const body = JSON.stringify(submitData);
+    try {
+      console.log('Submitting objective:', submitData)
+      const response = await fetch('http://localhost:3000/api/objectives', { // Replace '/your-endpoint-here' with your actual endpoint
+        method: 'POST',
+        headers: new Headers({
+          'content-type': 'application/json',
+          Accept: 'application/json',
+        }),
+        body,
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Handle success
+        console.log('Objective created:', data)
+        console.log('Objective successfully submitted!')
+        // Optionally clear the textarea or update UI here
+      } else {
+        // Handle server errors or invalid inputs
+        console.error('Submission failed:', data.message)
+        console.log(`Error: ${ data.message }`)
+      }
+    } catch (error) {
+      // Handle network errors
+      console.error('Network error:', error)
+      console.log('Network error, please try again later.')
+    }
+  }
 
   // Call this function when you want to test the POST request
   return (
@@ -177,12 +224,12 @@ export default function ObjectiveTypesPage () {
                     className="textarea textarea-bordered rounded-md bg-white w-full"
                     placeholder="Enter your response"
                     rows="4"
-                    value={descriptions[objectiveType.objective_type_id] || ''}
-                    onChange={(e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value)}
+                    value={ descriptions[objectiveType.objective_type_id] || '' }
+                    onChange={ (e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value) }
                   ></textarea>
                   <button
                     className="btn btn-accent mt-4 w-fit flex float-right"
-                    onClick={() => handleSubmit(objectiveType.objective_type_id)}
+                    onClick={ () => handleSubmit(objectiveType.objective_type_id) }
                   >
                     Submit
                   </button>
@@ -204,13 +251,13 @@ export default function ObjectiveTypesPage () {
         />
         <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-4">
           <div>
-            { objectives.map((objective) => (
-              <div key={ objective.objective_id } className="card w-full bg-info shadow-xl mb-16 mt-4">
+            { objectiveTypes.map((objectiveType) => (
+              <div key={ objectiveType.objective_type_id } className="card w-full bg-info shadow-xl mb-16 mt-4">
                 <div className="card-body">
                   <div>
-                    <h1 className="card-title float-start flex flex-1">{ objective.type }</h1>
+                    <h1 className="card-title float-start flex flex-1">{ objectiveType.type }</h1>
                     <p className="menu-title float-end flex flex-1">
-                      { new Date(objective.created_at).toLocaleString('en-US', {
+                      { new Date(objectiveType.description_date).toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -226,11 +273,11 @@ export default function ObjectiveTypesPage () {
                     className="textarea textarea-bordered rounded-md bg-white w-full"
                     placeholder="Enter your response"
                     rows="4"
-                    value={ descriptions[objective.objective_type_id] || '' }
-                    onChange={ (e) => handleDescriptionChange(objective.objective_type_id, e.target.value) }
+                    value={ descriptions[objectiveType.objective_type_id] || '' }
+                    onChange={ (e) => handleDescriptionChange(objectiveType.objective_type_id, e.target.value) }
                   ></textarea>
                   <button
-                    onClick={ () => handleSubmit(objective.objective_type_id, user_id, descriptions[objective.objective_type_id]) } // Replace `user_id` with actual user ID from your session/context
+                    onClick={ () => handleSubmit(objectiveType.objective_type_id, user_id, descriptions[objectiveType.objective_type_id]) }
                     className="btn btn-accent mt-4 w-fit flex float-right"
                   >
                     Submit
@@ -240,7 +287,7 @@ export default function ObjectiveTypesPage () {
                   <div>
                     <h1 className="card-title float-start flex flex-1">Tutor feedback</h1>
                     <p className="menu-title float-end flex flex-1">
-                      { new Date(objective.mid_comment_date).toLocaleString('en-US', {
+                      { new Date(objectiveType.mid_comment_date).toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -254,7 +301,7 @@ export default function ObjectiveTypesPage () {
                   <textarea
                     className="textarea textarea-bordered rounded-md"
                     placeholder="You have no feedback yet"
-                    value={ objective.mid_tutor_comment || 'You have no feedback yet' }
+                    value={ objectiveType.mid_tutor_comment || 'You have no feedback yet' }
                     readOnly
                   ></textarea>
                 </div>

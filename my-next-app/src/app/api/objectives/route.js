@@ -1,6 +1,7 @@
 // src/app/api/objectives/route.js
 
-import db from '../../../lib/db' // Adjust the import path based on your file structure
+import db from '../../../lib/db'
+import { NextResponse } from 'next/server' // Adjust the import path based on your file structure
 const fs = require('fs')
 
 const logFile = './api_logs.txt'
@@ -93,10 +94,10 @@ export async function GET () {
 //   }
 // }
 
-// export async function POST () {
+// export async function POST (request) {
 //   const user_id = 1 // Hardcoded user_id
 //   const objective_type_id = 1 // Hardcoded objective_type_id
-//   const description = 'This is a new objective' // Hardcoded description
+//   const description = 'This is a new objective'
 //
 //   try {
 //     const query = 'INSERT INTO objectives (objective_type_id, user_id, description) VALUES (?, ?, ?)'
@@ -154,22 +155,20 @@ export async function GET () {
 // }
 
 // pages/api/objectives.js
-export default async function handler(req, res) {
-  console.log('Received POST request')
-  if (req.method === 'POST') {
-    const { objective_type_id, user_id, description } = req.body;
-
-    // Add your logic to insert data into the database here.
-    // For demonstration, this just sends back what was received.
-    res.status(200).json({ objective_type_id, user_id, description });
-  } else {
-    // Handle any methods other than POST
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end('Method Not Allowed');
-  }
-}
-
-
+// export default async function handler(req, res) {
+//   console.log('Received POST request')
+//   if (req.method === 'POST') {
+//     const description= req.body;
+//
+//     // Add your logic to insert data into the database here.
+//     // For demonstration, this just sends back what was received.
+//     res.status(200).json({ objective_type_id, user_id, description });
+//   } else {
+//     // Handle any methods other than POST
+//     res.setHeader('Allow', ['POST']);
+//     res.status(405).end('Method Not Allowed');
+//   }
+// }
 
 // export async function POST (request) {
 //   console.log('Received POST request') // Confirm the request is received
@@ -232,4 +231,39 @@ export default async function handler(req, res) {
 //     });
 //   }
 // }
+
+export async function POST (request) {
+  try {
+    const { objective_type_id, description, user_id } = await request.json()
+    console.log(objective_type_id, description, user_id)
+
+    // Basic validation (example - you should replace with more specific checks)
+    if (!objective_type_id || !description || !user_id) {
+      return new Response(JSON.stringify({ message: 'Missing required fields' }), {
+        status: 400, // Bad Request
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Further validation and sanitization can be performed here
+    // Ensure objective_type_id, description, and user_id are of expected types and sanitized
+
+    const query = 'INSERT INTO objectives (objective_type_id, user_id, description) VALUES (?, ?, ?)'
+    const results = await db.query(query, [objective_type_id, user_id, description])
+
+    return NextResponse.json({ message: 'Objective created', results })
+  } catch (error) {
+    console.error('Failed to create objective:', error)
+    // More detailed error handling can be performed here based on the error type
+
+    let errorMessage = 'Failed to create objective'
+    let statusCode = 500 // Internal Server Error
+
+    return new Response(JSON.stringify({ message: errorMessage, error: error.message }), {
+      status: statusCode,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+}
+
 
