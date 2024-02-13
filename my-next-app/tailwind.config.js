@@ -14,7 +14,6 @@ module.exports = {
       },
     },
 
-
   },
   plugins: [require('daisyui')],
   daisyui: {
@@ -22,8 +21,14 @@ module.exports = {
       {
         mytheme: {
           'primary': '#ece3ca',
-          'secondary': '#178D43',
+          'secondary': '#218380',
           'info': '#ca8a04',
+          'success': '#178D43',
+          // DMC3756
+          'warning': '#E9E6DD',
+          'error': '#D4AA3A',
+          'bg-base-100': '#D4AA3A',
+          'bg-base-200': '#E9E6DD',
         },
       },
     ],
