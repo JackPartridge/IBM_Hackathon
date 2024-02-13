@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function Header () {
   return (
-    <div className="navbar bg-secondary drop-shadow-xl outline outline-1 shadow-black  navbar-style ">
+    <div className="navbar bg-secondary drop-shadow-xl outline outline-1 shadow-black  navbar-style" >
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={ 0 } role="button" className="btn btn-ghost lg:hidden">
@@ -12,7 +12,7 @@ export default function Header () {
             </svg>
           </div>
           <ul tabIndex={ 0 }
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-primary rounded-box w-52">
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
             <li><a>Item 1</a></li>
             <li>
               <a>Parent</a>
@@ -38,30 +38,9 @@ export default function Header () {
               </ul>
             </details>
           </li>
-          <li><a href={ '/calendar' }>Calendar</a></li>
-          <li><a href={ '/tutors' }>Tutors</a></li>
+          <li><a href={'/calendar'}>Calendar</a></li>
+          <li><a href={'/tutors'}>Tutors</a></li>
         </ul>
-      </div>
-      <div className="navbar-end">
-        <div className="dropdown dropdown-end">
-          <div tabIndex={ 0 } role="button" className="btn btn-ghost btn-circle avatar">
-            <div className="w-10 rounded-full">
-              <img alt="Tailwind CSS Navbar component"
-                   src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"/>
-            </div>
-          </div>
-          <ul tabIndex={ 0 }
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-primary rounded-box w-52">
-            <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
-            </li>
-            <li><a>Settings</a></li>
-            <li><a>Logout</a></li>
-          </ul>
-        </div>
       </div>
     </div>
   )

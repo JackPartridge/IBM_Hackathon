@@ -155,34 +155,32 @@ export default function ObjectiveTypesPage () {
       user_id: user_id,
       description: description,
     }
-    const body = JSON.stringify(submitData);
+    const body = JSON.stringify(submitData)
+
     try {
       console.log('Submitting objective:', submitData)
-      const response = await fetch('http://localhost:3000/api/objectives', { // Replace '/your-endpoint-here' with your actual endpoint
+      const response = await fetch('http://localhost:3000/api/objectives', {
         method: 'POST',
-        headers: new Headers({
-          'content-type': 'application/json',
-          Accept: 'application/json',
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body,
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        // Handle success
-        console.log('Objective created:', data)
-        console.log('Objective successfully submitted!')
-        // Optionally clear the textarea or update UI here
-      } else {
-        // Handle server errors or invalid inputs
-        console.error('Submission failed:', data.message)
-        console.log(`Error: ${ data.message }`)
+      if (!response.ok) {
+        // If the response is not ok, we throw an error to catch it in the catch block
+        const errorData = await response.json() // Assuming the server responds with JSON
+        throw new Error(`Error: ${ errorData.message || response.status }`)
       }
+
+      const data = await response.json() // Parse JSON data from the response
+      console.log('Objective created:', data)
+      console.log('Objective successfully submitted!')
+      // Optionally clear the textarea or update UI here
     } catch (error) {
-      // Handle network errors
-      console.error('Network error:', error)
-      console.log('Network error, please try again later.')
+      // Handle both network errors and errors thrown from not-ok responses
+      console.error('Submission error:', error.message)
+      console.log('Please try again later.')
     }
   }
 
@@ -190,7 +188,7 @@ export default function ObjectiveTypesPage () {
   return (
     <main className="bg-base-100">
       {/*TAB 1*/ }
-      <div role="tablist" className="tabs tabs-lifted p-16 bg-base-100">
+      <div role="tablist" className="tabs tabs-lifted p-16 bg-green-100">
         <input
           type="radio"
           name="my_tabs_2"
