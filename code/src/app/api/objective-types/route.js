@@ -2,10 +2,6 @@
 import db from '../../../lib/db'
 import { NextResponse } from 'next/server' // Adjust the import path based on your file structure
 
-const fs = require('fs');
-
-const logFile = './api_logs.txt';
-const logStream = fs.createWriteStream(logFile, { flags: 'a' }); //  'a' for appending
 export async function GET () {
   try {
     const query = `
@@ -40,13 +36,5 @@ export async function GET () {
       status: 500, headers: { 'Content-Type': 'application/json' },
     })
   }
-}
-
-export async function POST (request) {
-  const data = await request.json()
-
-  return NextResponse.json({
-    data,
-  });
 }
 
