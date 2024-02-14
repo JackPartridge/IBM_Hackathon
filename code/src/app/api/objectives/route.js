@@ -1,7 +1,6 @@
 // src/app/api/objectives/route.js
 
 import db from '../../../lib/db'
-import { NextResponse } from 'next/server' // Adjust the import path based on your file structure
 export async function GET () {
   try {
     const results = await db.query('SELECT * FROM objectives')
