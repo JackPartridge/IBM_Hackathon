@@ -10,7 +10,7 @@ export default function ObjectiveTypesPage () {
 
   const [objectives, setObjectives] = useState([])
   const [objectiveTypes, setObjectiveTypes] = useState([])
-  const [user_id, setUserId] = useState(1234)
+  const [user_id, setUserId] = useState(1)
   const [descriptions, setDescriptions] = useState({}) // Object to hold descriptions for each objective type
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -77,13 +77,12 @@ export default function ObjectiveTypesPage () {
   }, [])
 
   const handleSubmit = async (objectiveTypeId, user_id) => {
-    if (isSubmitting[objectiveTypeId]) return // Prevent submission if already submitting
+    if (isSubmitting[objectiveTypeId]) return
     setIsSubmitting(prev => (
       { ...prev, [objectiveTypeId]: true }
-    )) // Mark as submitting
+    ))
 
     const description = descriptions[objectiveTypeId]
-
     const submitData = {
       objective_type_id: objectiveTypeId,
       user_id: user_id,
@@ -102,20 +101,17 @@ export default function ObjectiveTypesPage () {
       })
 
       if (!response.ok) {
-        // If the response is not ok, we throw an error to catch it in the catch block
-        const errorData = await response.json() // Assuming the server responds with JSON
+        const errorData = await response.json()
         throw new Error(`Error: ${ errorData.message || response.status }`)
       }
 
       setSubmittedObjectiveTypes(prev => (
         { ...prev, [objectiveTypeId]: true }
       ))
-
-      const data = await response.json() // Parse JSON data from the response
-      console.log('Objective created:', data)
       console.log('Objective successfully submitted!')
 
-      const ai_response = await fetch('https://ai_tutor-1-h8642591.deta.app/query/1234', {
+      // Fetch AI response
+      const ai_response = await fetch('https://ai_tutor-1-h8642591.deta.app/query/1111', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,14 +119,38 @@ export default function ObjectiveTypesPage () {
         body: JSON.stringify({ description }),
       })
 
-      // store the response in a variable
+      if (!ai_response.ok) {
+        throw new Error('Failed to fetch AI response')
+      }
+
       const ai_data = await ai_response.json()
       console.log('AI response:', ai_data)
-      // Optionally clear the textarea or update UI here
+
+      const updateData = {
+        objective_type_id: objectiveTypeId,
+        user_id: user_id,
+        ai_comment: ai_data.reply, // Assuming the AI response contains a 'reply' key
+      }
+      const updateResponse = await fetch('/api/ai-tutor', { // Use the correct endpoint for updating the ai_comment
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      })
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update objective with AI comment')
+      }
+
+      console.log('AI comment updated successfully')
+      // Handle UI update for successful AI comment update
     } catch (error) {
-      // Handle both network errors and errors thrown from not-ok responses
       console.error('Submission error:', error.message)
-      console.log('Please try again later.')
+      setIsSubmitting(prev => (
+        { ...prev, [objectiveTypeId]: false }
+      )) // Reset submitting state on error
+      // Handle UI update for error scenario
     }
   }
 
@@ -245,8 +265,7 @@ export default function ObjectiveTypesPage () {
                         <label className="modal-backdrop" htmlFor="my_modal_7"></label>
                       </div>
                       <label htmlFor="my_modal_7"
-                             className="btn btn-primary outline outline-black mt-4 w-fit flex float-right ml-6">Open
-                                                                                                                Modal</label>
+                             className="btn btn-primary outline outline-black mt-4 w-fit flex float-right ml-6">Upload Files</label>
                     </div>
                   </div>
                   <div className="card shadow-xl ml-32 p-10 m-8 mt-0 bg-primary">
@@ -256,7 +275,7 @@ export default function ObjectiveTypesPage () {
                     <textarea
                       className="textarea textarea-bordered rounded-md bg-white w-full"
                       placeholder="You have no feedback yet"
-                      value={ }
+                      value={ objectiveType.ai_comment }
                       readOnly
                     ></textarea>
                   </div>
