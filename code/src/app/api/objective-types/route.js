@@ -1,6 +1,5 @@
 // src/app/api/objective-types/route.js
 import db from '../../../lib/db'
-import { NextResponse } from 'next/server' // Adjust the import path based on your file structure
 
 export async function GET () {
   try {
@@ -31,7 +30,6 @@ export async function GET () {
     })
   } catch (error) {
     console.error('Failed to fetch objectives:', error)
-    logStream.write(`Failed to fetch objectives: ${error}\n`);
     return new Response(JSON.stringify({ message: 'Failed to fetch data' }), {
       status: 500, headers: { 'Content-Type': 'application/json' },
     })
