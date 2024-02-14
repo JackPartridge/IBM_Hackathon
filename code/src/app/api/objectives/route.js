@@ -16,29 +16,6 @@ export async function GET () {
   }
 }
 
-// TEST POST CODE ------------------------------------------------------------------------------------------------
-// export async function POST (request) {
-//   const objective_type_id = 1
-//   const user_id = 1
-//   const description = 'This is a new objective'
-//
-//   try {
-//     const query = 'INSERT INTO objectives (objective_type_id, user_id, description) VALUES (?, ?, ?)';
-//     const results = await db.query(query, [objective_type_id, user_id, description]);
-//     return new Response(JSON.stringify({ message: 'Objective created', results }), {
-//       headers: { 'Content-Type': 'application/json' },
-//     });
-//   } catch (error) {
-//     console.error('Failed to create objective:', error);
-//     // Assuming console.error is your way of logging errors, otherwise use a proper logger
-//     return new Response(JSON.stringify({ message: 'Failed to create objective', error: error.message }), {
-//       status: 500,
-//       headers: { 'Content-Type': 'application/json' },
-//     });
-//   }
-// }
-// ----------------------------------------------------------------------------------------------------------------
-
 export async function POST (request) {
   // get current date and time for logging
   const current_datetime = new Date()
