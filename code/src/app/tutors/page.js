@@ -10,11 +10,11 @@ export default function ObjectiveTypesPage () {
 
   const [objectives, setObjectives] = useState([])
   const [objectiveTypes, setObjectiveTypes] = useState([])
-  const [user_id, setUserId] = useState(1) // Assuming user_id is known, static, or fetched
+  const [user_id, setUserId] = useState(1234)
   const [descriptions, setDescriptions] = useState({}) // Object to hold descriptions for each objective type
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null)
 
   const [showDropzone, setShowDropzone] = useState(false)
 
@@ -114,6 +114,18 @@ export default function ObjectiveTypesPage () {
       const data = await response.json() // Parse JSON data from the response
       console.log('Objective created:', data)
       console.log('Objective successfully submitted!')
+
+      const ai_response = await fetch('https://ai_tutor-1-h8642591.deta.app/query/1234', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description }),
+      })
+
+      // store the response in a variable
+      const ai_data = await ai_response.json()
+      console.log('AI response:', ai_data)
       // Optionally clear the textarea or update UI here
     } catch (error) {
       // Handle both network errors and errors thrown from not-ok responses
@@ -124,19 +136,19 @@ export default function ObjectiveTypesPage () {
 
   const handleFileSubmit = async () => {
     if (!file) {
-      alert('Please select a file first.');
-      return;
+      alert('Please select a file first.')
+      return
     }
 
-    const reader = new FileReader();
+    const reader = new FileReader()
     reader.onload = async (event) => {
-      const binaryStr = event.target.result;
+      const binaryStr = event.target.result
 
       // Convert ArrayBuffer to binary string
-      let binary = '';
-      const bytes = new Uint8Array(binaryStr);
+      let binary = ''
+      const bytes = new Uint8Array(binaryStr)
       for (let i = 0; i < bytes.length; i++) { // Use bytes.length instead of len
-        binary += String.fromCharCode(bytes[i]);
+        binary += String.fromCharCode(bytes[i])
       }
 
       // Send this binary string to your server
@@ -147,24 +159,24 @@ export default function ObjectiveTypesPage () {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ user_id, file: btoa(binary) }), // Convert binary string to base64
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Network response was not ok')
         }
 
-        const data = await response.json();
-        console.log('Upload successful', data);
-        alert('Upload successful');
+        const data = await response.json()
+        console.log('Upload successful', data)
+        alert('Upload successful')
         // Close the modal
-        document.getElementById('my_modal_7').checked = false;
+        document.getElementById('my_modal_7').checked = false
       } catch (error) {
-        console.error('Upload failed:', error);
-        alert('Upload failed');
+        console.error('Upload failed:', error)
+        alert('Upload failed')
       }
-    };
+    }
 
-    reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(file)
   }
 
   // Call this function when you want to test the POST request
@@ -232,7 +244,9 @@ export default function ObjectiveTypesPage () {
                         </div>
                         <label className="modal-backdrop" htmlFor="my_modal_7"></label>
                       </div>
-                      <label htmlFor="my_modal_7" className="btn btn-primary outline outline-black mt-4 w-fit flex float-right ml-6">Open Modal</label>
+                      <label htmlFor="my_modal_7"
+                             className="btn btn-primary outline outline-black mt-4 w-fit flex float-right ml-6">Open
+                                                                                                                Modal</label>
                     </div>
                   </div>
                   <div className="card shadow-xl ml-32 p-10 m-8 mt-0 bg-primary">
@@ -242,7 +256,7 @@ export default function ObjectiveTypesPage () {
                     <textarea
                       className="textarea textarea-bordered rounded-md bg-white w-full"
                       placeholder="You have no feedback yet"
-                      value={ objectiveType.mid_tutor_comment }
+                      value={ }
                       readOnly
                     ></textarea>
                   </div>

@@ -21,7 +21,7 @@ export default function Example () {
         </div>
         <div className="mx-auto max-w-2xl sm:py-48 lg:py-56 flex flex-1 h-screen">
           <div className="text-center p-6 -mt-20">
-            <p className="font-semibold text-green-700 -mt-10" style={ { fontFamily: 'Raleway, sans-serif' } }>
+            <p className="font-semibold text-secondary -mt-10" style={ { fontFamily: 'Raleway, sans-serif' } }>
               AI GOVERNS THE FUTURE OF STUDYING
             </p>
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mt-2"
