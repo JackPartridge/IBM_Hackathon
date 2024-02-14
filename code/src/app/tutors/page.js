@@ -24,7 +24,7 @@ export default function ObjectiveTypesPage () {
     async function fetchObjectiveTypes () {
       setIsLoading(true)
       try {
-        const res = await fetch('/api/objective-types') // Adjust the endpoint if needed
+        const res = await fetch('/api/objectivetypes') // Adjust the endpoint if needed
         const data = await res.json()
 
         // fetch objectives
@@ -111,7 +111,7 @@ export default function ObjectiveTypesPage () {
       console.log('Objective successfully submitted!')
 
       // Fetch AI response
-      const ai_response = await fetch('https://ai_tutor-1-h8642591.deta.app/query/1111', {
+      const ai_response = await fetch('https://ai_tutor-1-h8642591.deta.app/query/2222', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
