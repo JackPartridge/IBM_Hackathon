@@ -1,27 +1,40 @@
 import db from '../../../lib/db'
 
-export async function POST(request) {
+export async function POST (request) {
   try {
-    // We expect the request to contain objective_type_id, user_id, and the AI comment
-    const { objective_type_id, user_id, ai_comment } = await request.json();
+    const { objective_type_id, user_id, ai_comment } = await request.json()
 
-    // Ensure all required fields are present
-    if (!objective_type_id || !user_id || !ai_comment) {
+    if (!objective_type_id || !ai_comment || !user_id) {
       return new Response(JSON.stringify({ message: 'Missing required fields' }), {
-        status: 400, headers: { 'Content-Type': 'application/json' },
-      });
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
-    const query = 'UPDATE objectives SET ai_comment = ? WHERE objective_type_id = ? AND user_id = ?';
-    const results = await db.query(query, [ai_comment, objective_type_id, user_id]);
+    // Check if a row with the given objective_type_id and user_id already exists
+    const checkQuery = 'SELECT * FROM objectives WHERE objective_type_id = ? AND user_id = ?'
+    const checkResults = await db.query(checkQuery, [objective_type_id, user_id])
+
+    let query, results
+    if (checkResults.length > 0) {
+      // If a row exists, update it
+      query = 'UPDATE objectives SET ai_comment = ? WHERE objective_type_id = ? AND user_id = ?'
+      results = await db.query(query, [ai_comment, objective_type_id, user_id])
+    } else {
+      // If no row exists, insert a new one (optional, based on your requirements)
+      query = 'INSERT INTO objectives (objective_type_id, user_id, ai_comment) VALUES (?, ?, ?)'
+      results = await db.query(query, [objective_type_id, user_id, ai_comment])
+    }
 
     return new Response(JSON.stringify({ message: 'AI comment updated', results }), {
-      status: 200, headers: { 'Content-Type': 'application/json' },
-    });
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (error) {
-    console.error('Failed to update AI comment:', error);
-    return new Response(JSON.stringify({ message: 'Failed to update AI comment' }), {
-      status: 500, headers: { 'Content-Type': 'application/json' },
-    });
+    console.error('Failed to update objective:', error)
+    return new Response(JSON.stringify({ message: 'Failed to update objective', error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

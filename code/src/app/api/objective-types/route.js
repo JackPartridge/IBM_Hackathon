@@ -9,6 +9,7 @@ export async function GET () {
       o.user_id,
       o.description,
       o.description_date,
+      o.ai_comment,
       o.mid_comment,
       o.mid_comment_date,
       o.end_comment,
